@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NASA Explorer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!--  AUTH SCREEN -->
+<section id="auth-section" class="auth-container">
+  <div class="auth-card">
+    <h2>Login</h2>
+    <label for="email">Email</label>    
+    <input id="email" type="email" placeholder="Email">
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Sign In</button>
+
+    <p>Don't have an account?</p>
+    <button onclick="signUp()" class="secondary">Sign Up</button>
+  </div>
+</section>
+
+<!--  MAIN APP (HIDDEN INITIALLY) -->
+<section id="app-section" style="display:none;">
+
+  <h1> NASA Explorer</h1>
+
+  <button onclick="logout()">Logout</button>
+
+  <div>
+    <button onclick="loadAPOD()"> APOD</button>
+    <button onclick="loadMars()"> Mars</button>
+    <button onclick="loadFavorites()"> Favorites</button>
+  </div>
+
+  <main id="root"></main>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script>
+  const supabase = window.supabase.createClient(
+    "YOUR_SUPABASE_URL",
+    "YOUR_SUPABASE_KEY"
+  );
+</script>
+
+<script src=""></script>
+
+</body>
+</html>
