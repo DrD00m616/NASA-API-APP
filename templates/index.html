@@ -3,11 +3,16 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NASA Explorer</title>
+  <link rel="icon" type="image/png" href="/static/images/geass.png">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
+<video autoplay muted loop id="bg-video">
+  <source src="{{ url_for('static', filename='videos/default.mp4') }}" type="video/mp4">
+</video>
 
+<div class="overlay"></div>
 <!--  AUTH SCREEN -->
 <section id="auth-section" class="auth-container">
   <div class="auth-card">
@@ -48,15 +53,14 @@
 
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-<script>
-  const supabaseClient = supabase.createClient(
+  const supabaseClient = createClient(
     "{{ supabase_url }}",
     "{{ supabase_key }}"
   );
 
-  // expose globally
   window.supabase = supabaseClient;
 </script>
 

@@ -62,8 +62,14 @@ def events():
     try:
         url = "https://eonet.gsfc.nasa.gov/api/v3/events"
         res = requests.get(url, timeout=5)
+
+        if res.status_code != 200:
+            return jsonify({"error": "API failed"}), 500
+
         return jsonify(res.json())
+
     except Exception as e:
+        print("ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
 
