@@ -21,7 +21,7 @@
       <label for="password">Password</label>
       <input id="password" type="password" placeholder="Password" minlength="8" required>
 
-      <button type="submit">Sign In</button>
+      <button type="button" onclick="login()">Sign In</button>
 
     </form>
 
@@ -51,8 +51,8 @@
 
 <script>
   const supabase = window.supabase.createClient(
-    "YOUR_SUPABASE_URL",
-    "YOUR_SUPABASE_KEY"
+    "{{ supabase_url }}",
+    "{{ supabase_key }}"
   );
 </script>
 
