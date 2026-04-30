@@ -1,25 +1,15 @@
-// ================= BACKGROUND VIDEO =================
-
-// 🎥 Change background video
-function changeBackground(videoName) {
-  const video = document.getElementById("bg-video");
-  if (!video) return;
-
-  video.src = `/static/videos/${videoName}`;
-  video.load();
-}
-
-
 // ================= UI CONTROL =================
 
 function showApp() {
   document.getElementById("auth-section").style.display = "none";
   document.getElementById("app-section").style.display = "block";
+  document.body.classList.add("app-active");
 }
 
 function showAuth() {
   document.getElementById("auth-section").style.display = "flex";
   document.getElementById("app-section").style.display = "none";
+  document.body.classList.remove("app-active");
 }
 
 
@@ -29,21 +19,13 @@ async function login() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  if (!email || !password) {
-    alert("Enter email and password");
-    return;
-  }
-
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  if (error) {
-    alert(error.message);
-  } else {
-    showApp();
-  }
+  if (error) alert(error.message);
+  else showApp();
 }
 
 async function signUp() {
@@ -55,7 +37,7 @@ async function signUp() {
     password,
   });
 
-  alert(error ? error.message : "Signup successful! Now login.");
+  alert(error ? error.message : "Signup successful!");
 }
 
 async function logout() {
@@ -63,47 +45,55 @@ async function logout() {
   showAuth();
 }
 
-
-// ================= ON LOAD =================
-
 window.onload = async () => {
-  changeBackground("default.mp4"); // default video
-
   const { data } = await supabase.auth.getUser();
-
-  if (data.user) {
-    showApp();
-  } else {
-    showAuth();
-  }
+  data.user ? showApp() : showAuth();
 };
 
 
-// ================= NASA API =================
+// ================= VIDEO CHANGE =================
 
-// 🌌 APOD
-async function loadAPOD() {
-  changeBackground("default.mp4");
-
-  try {
-    const res = await fetch("/apod");
-    const data = await res.json();
-
-    document.getElementById("root").innerHTML = `
-      <div class="card">
-        <img src="${data.url}" />
-        <h3>${data.title}</h3>
-        <p>${data.explanation ? data.explanation.slice(0, 100) : ""}</p>
-        <button onclick="saveFavorite('${data.title}', '${data.url}')">⭐ Save</button>
-      </div>
-    `;
-  } catch {
-    alert("Error loading APOD");
-  }
+function changeBackground(video) {
+  const videoEl = document.getElementById("bg-video");
+  videoEl.src = `/static/videos/${video}`;
+  videoEl.load();
 }
 
 
-// 🛰️ NASA Images
+// ================= APOD =================
+
+async function loadAPOD() {
+  changeBackground("default.mp4");
+
+  const res = await fetch("/apod");
+  const data = await res.json();
+
+  document.getElementById("root").innerHTML = `
+    <div class="card">
+      <img src="static/images/reze.png" 
+      style="
+          width: 250px !important;
+          height: 250px !important;
+          object-fit: cover;
+
+          border-radius: 50%;
+
+          border: 2px solid #00f0ff;
+
+          box-shadow:
+            0 0 10px #00f0ff,
+            0 0 30px #ff2bd6;
+"/>
+      <h3>${data.title}</h3>
+      <p>${data.explanation}</p>
+      <button onclick="saveFavorite('${data.title}', '${data.url}')">⭐ Save</button>
+    </div>
+  `;
+}
+
+
+// ================= NASA IMAGES =================
+
 async function loadImages() {
   changeBackground("images.mp4");
 
@@ -113,57 +103,60 @@ async function loadImages() {
 
     let html = "";
 
-    const items = data.collection.items;
+    const items = data.collection.items.filter(item => item.links);
 
     items.slice(0, 8).forEach(item => {
-      const img = item.links && item.links.length > 0 ? item.links[0].href : "";
+      const img = item.links[0].href;
       const title = item.data[0].title;
 
       html += `
         <div class="card">
           <img src="${img}" />
           <p>${title}</p>
+          <button onclick="saveFavorite('${title}', '${img}')">⭐ Save</button>
         </div>
       `;
     });
 
     document.getElementById("root").innerHTML = html;
 
-  } catch {
-    alert("Error loading images");
+  } catch (err) {
+    document.getElementById("root").innerHTML = "Error loading images";
   }
 }
 
 
-// 🌍 EONET Events
+// ================= EVENTS =================
+
 async function loadEvents() {
   changeBackground("events.mp4");
 
   try {
-    document.getElementById("root").innerHTML = "Loading events...";
-
     const res = await fetch("/events");
     const data = await res.json();
 
     let html = "";
 
     data.events.slice(0, 8).forEach(event => {
-      const title = event.title;
-      const category = event.categories[0]?.title || "Unknown";
-      const date = event.geometry[0]?.date || "";
+      const title = event.title || "No title";
+      const category = event.categories?.[0]?.title || "Unknown";
+      const date = event.geometry?.[0]?.date
+        ? event.geometry[0].date.split("T")[0]
+        : "No date";
 
       html += `
         <div class="card">
           <h3>${title}</h3>
           <p>Type: ${category}</p>
           <p>Date: ${date}</p>
+          <button onclick="saveFavorite('${title}', '')">⭐ Save</button>
         </div>
       `;
     });
 
     document.getElementById("root").innerHTML = html;
 
-  } catch {
+  } catch (err) {
     document.getElementById("root").innerHTML = "Error loading events";
   }
 }
@@ -171,7 +164,6 @@ async function loadEvents() {
 
 // ================= FAVORITES =================
 
-// Save favorite
 async function saveFavorite(title, image) {
   const { data } = await supabase.auth.getUser();
   const user = data.user;
@@ -192,15 +184,11 @@ async function saveFavorite(title, image) {
   alert(error ? error.message : "Saved!");
 }
 
-
-// Load favorites
 async function loadFavorites() {
   changeBackground("favorites.mp4");
 
   const { data } = await supabase.auth.getUser();
   const user = data.user;
-
-  console.log("User:", user);
 
   if (!user) {
     alert("Login first");
@@ -211,8 +199,6 @@ async function loadFavorites() {
     .from("favorites")
     .select("*")
     .eq("user_id", user.id);
-
-  console.log("Favorites:", favs, error);
 
   if (error) {
     alert(error.message);

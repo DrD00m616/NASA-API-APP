@@ -7,26 +7,78 @@
 
 /* BODY */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Orbitron', sans-serif;
+  color: #e0f7ff;
+  background: #0a0a0f;
 }
+
+/* TITLE */
+h1 {
+  color: #00f0ff;
+  text-shadow:
+    0 0 5px #00f0ff,
+    0 0 20px #00f0ff,
+    0 0 40px #00f0ff;
+
+  font-weight: 600;
+  margin-top: 20px;
+}
+
+
+/* ================= VIDEO BACKGROUND ================= */
+
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  z-index: -10;
+  pointer-events: none;
+
+  display: none; /* hidden before login */
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  z-index: -5;
+  pointer-events: none;
+
+  display: none;
+}
+
+/* show video AFTER login */
+body.app-active #bg-video,
+body.app-active .overlay {
+  display: block;
+}
+
 
 /* ================= LOGIN PAGE ================= */
 
-/* Background only for login */
 #auth-section {
   min-height: 100vh;
 
-  /* YOUR IMAGE HERE */
-  background: url("images/login-page-bg-img.png") no-repeat center center/cover;
+  background: url("/static/images/login-page-bg-img.png") no-repeat center center/cover;
 
   display: flex;
   justify-content: center;
   align-items: center;
-  
+
+  position: relative;
+  z-index: 10;
 }
 
-
-/* Glass card */
 .auth-card {
   width: 320px;
   padding: 30px;
@@ -39,13 +91,11 @@ body {
   box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 
-/* Title */
 .auth-card h2 {
   margin-bottom: 15px;
   color: white;
 }
 
-/* Labels */
 .auth-card label {
   display: block;
   text-align: left;
@@ -53,10 +103,6 @@ body {
   color: white;
 }
 
-/* Inputs */
-.auth-card input {
-  outline: none;
-}
 .auth-card input {
   width: 100%;
   padding: 12px;
@@ -64,18 +110,17 @@ body {
   border-radius: 10px;
   border: none;
   background: rgba(255,255,255,0.9);
+  outline: none;
 }
-/* invalid input */
+
 input:focus:invalid {
   border: 2px solid red;
 }
 
-/* valid input */
 input:focus:valid {
   border: 2px solid green;
 }
 
-/* Buttons */
 .auth-card button {
   width: 100%;
   padding: 12px;
@@ -86,55 +131,154 @@ input:focus:valid {
   color: white;
   cursor: pointer;
 }
+
 .auth-card button:hover {
   background: #163bbf;
 }
-/* Secondary button */
+
 .auth-card .secondary {
   background: transparent;
   border: 1px solid white;
 }
 
-/* Text */
 .auth-card p {
   margin-top: 10px;
   color: white;
 }
 
-/* ================= APP PAGE ================= */
+
+/* ================= APP ================= */
 
 #app-section {
   padding: 20px;
   text-align: center;
+  position: relative;
+  z-index: 10;
 }
 
-/* Buttons */
+
+/* NAV BUTTONS */
 #app-section button {
-  padding: 10px;
-  margin: 5px;
-  border-radius: 8px;
-  border: none;
+  margin: 10px;
+  padding: 12px 20px;
+
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+
+  border: 2px solid #00f0ff;
+  color: #00f0ff;
+  font-weight: bold;
+
+  border-radius: 12px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
-/* Grid */
+#app-section button:hover {
+  background: #00f0ff;
+  color: black;
+
+  box-shadow:
+    0 0 10px #00f0ff,
+    0 0 30px #00f0ff;
+}
+
+
+/* ROOT LAYOUT */
 #root {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
-  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  margin-top: 40px;
 }
 
-/* Cards */
+
+/* ================= CARD ================= */
+
 .card {
-  background: #1e293b;
-  padding: 10px;
-  border-radius: 10px;
-  color: white;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px;
+
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: blur(15px);
+
+  border: 1px solid #00f0ff55;
+  border-radius: 20px;
+
+  box-shadow:
+    0 0 15px #00f0ff33,
+    0 0 40px #ff2bd622;
+
+  color: #e0f7ff;
+  text-align: center;
 }
 
-/* Images */
 .card img {
   width: 100%;
-  border-radius: 8px;
+  max-height: 400px;
+  object-fit: cover;
+
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 16px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+
+/* SAVE BUTTON */
+.card button {
+  margin-top: 20px;
+  padding: 12px 20px;
+
+  background: transparent;
+  border: 2px solid #ff2bd6;
+
+  color: #ff2bd6;
+  font-weight: bold;
+
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card button:hover {
+  background: #ff2bd6;
+  color: black;
+
+  box-shadow:
+    0 0 10px #ff2bd6,
+    0 0 30px #ff2bd6;
+}
+
+
+/* ================= CYBER EFFECT ================= */
+
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.2) 3px
+  );
+
+  pointer-events: none;
 }
