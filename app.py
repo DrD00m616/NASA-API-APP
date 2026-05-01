@@ -64,16 +64,11 @@ def events():
 
         res = requests.get(
             url,
-            timeout=10,
+            timeout=5,
             headers={"User-Agent": "Mozilla/5.0"}
         )
 
-        if res.status_code != 200:
-            return jsonify({"events": []})
-
-        data = res.json()
-
-        return jsonify(data)
+        return jsonify(res.json())
 
     except Exception as e:
         print("EVENT ERROR:", e)

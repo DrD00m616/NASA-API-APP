@@ -75,7 +75,8 @@ async function loadAPOD() {
 
   document.getElementById("root").innerHTML = `
     <div class="card">
-      <img src="/static/images/reze.png" class="apod-circle"/>
+      <img src="/static/images/reze.png" class="apod-circle"
+      style="border-radius: 50%; width: 100px; height: 100px; object-fit: cover;"/>
       <h3>${data.title}</h3>
       <p>${data.explanation}</p>
       <button id="saveBtn">⭐ Save</button>
@@ -129,8 +130,19 @@ async function loadImages() {
 async function loadEvents() {
   changeBackground("events.mp4");
 
+  // show loading immediately
+  document.getElementById("root").innerHTML = "Loading events...";
+
   try {
-    const res = await fetch(`${API_BASE}/events`);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+
+    const res = await fetch(`${API_BASE}/events`, {
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
     const data = await res.json();
 
     if (!data.events || data.events.length === 0) {
@@ -160,11 +172,12 @@ async function loadEvents() {
     document.getElementById("root").innerHTML = html;
 
   } catch (err) {
-    console.error(err);
-    document.getElementById("root").innerHTML = "Error loading events";
+    console.error("EVENT ERROR:", err);
+
+    document.getElementById("root").innerHTML =
+      "Events failed to load (slow API). Try again.";
   }
 }
-
 
 // ================= FAVORITES =================
 
