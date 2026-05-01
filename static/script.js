@@ -139,6 +139,11 @@ async function loadEvents() {
     const res = await fetch("/events");
     const data = await res.json();
 
+    if (!data.events || data.events.length === 0) {
+      document.getElementById("root").innerHTML = "No events available";
+      return;
+    }
+
     let html = "";
 
     data.events.slice(0, 8).forEach(event => {
@@ -161,10 +166,10 @@ async function loadEvents() {
     document.getElementById("root").innerHTML = html;
 
   } catch (err) {
+    console.error(err);
     document.getElementById("root").innerHTML = "Error loading events";
   }
 }
-
 
 // ================= FAVORITES =================
 
