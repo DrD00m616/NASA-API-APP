@@ -86,9 +86,13 @@ async function loadAPOD() {
 "/>
       <h3>${data.title}</h3>
       <p>${data.explanation}</p>
-      <button onclick="saveFavorite('${data.title}', '${data.url}')">⭐ Save</button>
+      <button id="saveBtn">⭐ Save</button>
     </div>
   `;
+  document.getElementById("saveBtn").onclick = () => {
+    const media = data.media_type === "image" ? data.url : "";
+    saveFavorite(data.title, media);
+  };
 }
 
 
