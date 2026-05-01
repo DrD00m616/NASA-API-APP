@@ -61,16 +61,23 @@ def images():
 def events():
     try:
         url = "https://eonet.gsfc.nasa.gov/api/v3/events"
-        res = requests.get(url, timeout=5)
+
+        res = requests.get(
+            url,
+            timeout=10,
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
 
         if res.status_code != 200:
-            return jsonify({"error": "API failed"}), 500
+            return jsonify({"events": []})
 
-        return jsonify(res.json())
+        data = res.json()
+
+        return jsonify(data)
 
     except Exception as e:
-        print("ERROR:", e)
-        return jsonify({"error": str(e)}), 500
+        print("EVENT ERROR:", e)
+        return jsonify({"events": []})
 
 
 if __name__ == "__main__":
