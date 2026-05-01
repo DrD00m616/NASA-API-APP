@@ -1,3 +1,7 @@
+// ================= GLOBAL BASE URL =================
+const API_BASE = window.location.origin;
+
+
 // ================= UI CONTROL =================
 
 function showApp() {
@@ -51,11 +55,12 @@ window.onload = async () => {
 };
 
 
-// ================= VIDEO CHANGE =================
+// ================= VIDEO =================
 
 function changeBackground(video) {
   const videoEl = document.getElementById("bg-video");
-  videoEl.src = `/static/videos/${video}`;
+
+  videoEl.src = `${window.location.origin}/static/videos/${video}`;
   videoEl.load();
 }
 
@@ -65,30 +70,18 @@ function changeBackground(video) {
 async function loadAPOD() {
   changeBackground("default.mp4");
 
-  const res = await fetch("/apod");
+  const res = await fetch(`${API_BASE}/apod`);
   const data = await res.json();
 
   document.getElementById("root").innerHTML = `
     <div class="card">
-      <img src="static/images/reze.png" 
-      style="
-          width: 250px !important;
-          height: 250px !important;
-          object-fit: cover;
-
-          border-radius: 50%;
-
-          border: 2px solid #00f0ff;
-
-          box-shadow:
-            0 0 10px #00f0ff,
-            0 0 30px #ff2bd6;
-"/>
+      <img src="/static/images/reze.png" class="apod-circle"/>
       <h3>${data.title}</h3>
       <p>${data.explanation}</p>
       <button id="saveBtn">⭐ Save</button>
     </div>
   `;
+
   document.getElementById("saveBtn").onclick = () => {
     const media = data.media_type === "image" ? data.url : "";
     saveFavorite(data.title, media);
@@ -102,7 +95,7 @@ async function loadImages() {
   changeBackground("images.mp4");
 
   try {
-    const res = await fetch("/images");
+    const res = await fetch(`${API_BASE}/images`);
     const data = await res.json();
 
     let html = "";
@@ -111,7 +104,7 @@ async function loadImages() {
 
     items.slice(0, 8).forEach(item => {
       const img = item.links[0].href;
-      const title = item.data[0].title;
+      const title = item.data[0].title.replace(/'/g, "\\'");
 
       html += `
         <div class="card">
@@ -125,6 +118,7 @@ async function loadImages() {
     document.getElementById("root").innerHTML = html;
 
   } catch (err) {
+    console.error(err);
     document.getElementById("root").innerHTML = "Error loading images";
   }
 }
@@ -136,7 +130,7 @@ async function loadEvents() {
   changeBackground("events.mp4");
 
   try {
-    const res = await fetch("/events");
+    const res = await fetch(`${API_BASE}/events`);
     const data = await res.json();
 
     if (!data.events || data.events.length === 0) {
@@ -147,7 +141,7 @@ async function loadEvents() {
     let html = "";
 
     data.events.slice(0, 8).forEach(event => {
-      const title = event.title || "No title";
+      const title = (event.title || "No title").replace(/'/g, "\\'");
       const category = event.categories?.[0]?.title || "Unknown";
       const date = event.geometry?.[0]?.date
         ? event.geometry[0].date.split("T")[0]
@@ -171,27 +165,37 @@ async function loadEvents() {
   }
 }
 
+
 // ================= FAVORITES =================
 
 async function saveFavorite(title, image) {
-  const { data } = await supabase.auth.getUser();
-  const user = data.user;
+  console.log("Saving:", title, image);
 
-  if (!user) {
-    alert("Login first");
+  const { data, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !data.user) {
+    alert("Login expired. Please login again.");
     return;
   }
 
-  const { error } = await supabase.from("favorites").insert([
-    {
-      user_id: user.id,
-      title: title,
-      image_url: image,
-    },
-  ]);
+  const { error } = await supabase
+    .from("favorites")
+    .insert([
+      {
+        user_id: data.user.id,
+        title: title,
+        image_url: image,
+      },
+    ]);
 
-  alert(error ? error.message : "Saved!");
+  if (error) {
+    console.error(error);
+    alert(error.message);
+  } else {
+    alert("Saved!");
+  }
 }
+
 
 async function loadFavorites() {
   changeBackground("favorites.mp4");
